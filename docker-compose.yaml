@@ -1,0 +1,28 @@
+version: '3.8'
+
+services: # the different images that will be running as containers
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env.local
+
+  web: # service name
+
+    #build the image for the web service from the dockerfile in parent directory.  
+    build: ./backend
+
+    command: python manage.py runserver 0.0.0.0:8000
+    
+    # map data and files from parent directory in host to api directory in docker container
+    volumes: 
+      - ./backend/:/usr/src/app/
+    env_file:
+      - ./.env.local
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+volumes:
+  postgres_data:
